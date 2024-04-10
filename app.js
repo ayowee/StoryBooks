@@ -4,9 +4,10 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const exphbs = require('express-handlebars')
+const methodOverride = require('method-override')
 const passport = require('passport')
 const session = require('express-session')
-const MongoStore = require('connect-mongo')(session)
+const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db')
 
 
@@ -29,17 +30,24 @@ if(process.env.NODE_ENV === 'development') {
 app.engine('.hbs', exphbs.engine({defaultLayout: 'main', extname: '.hbs'}));
 app.set('view engine', '.hbs');
 
-//Sessions
-const store = new MongoStore({
-    mongooseConnection: mongoose.connection
-  });
-  
-  app.use(session({
-    secret: 'your_secret_key', // Replace with a strong secret key
-    resave: false,
-    saveUninitialized: false,
-    store: store
-  }));
+//Sessions 
+
+// Sessions
+app.use(
+    session({
+      secret: 'keyboard cat',
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({mongoUrl: process.env.MONGO_URI,}),
+}));
+
+// this one i gave me an error
+// app.use(session({
+//     secret: 'Rocket Rabbit', 
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore({ mongooseConnection: mongoose.connection })
+// }));
 
 //Passport middleware
 app.use(passport.initialize())
